@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.95"
 chrono = "0.4.39"
-poem = "3.0.0"
+poem = {version = "3.0.0", features=["test"]}
 poem-openapi = {version = "5.1.5", features=["swagger-ui"]}
 shuttle-poem = "0.52.0"
 shuttle-runtime = "0.52.0"
