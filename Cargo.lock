@@ -946,6 +946,7 @@ dependencies = [
 name = "meet-backend"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "chrono",
  "poem",
  "poem-openapi",
