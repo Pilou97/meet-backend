@@ -15,6 +15,12 @@ pub struct MeetingName {
     inner: String,
 }
 
+impl AsRef<String> for MeetingName {
+    fn as_ref(&self) -> &String {
+        &self.inner
+    }
+}
+
 impl TryFrom<String> for MeetingName {
     type Error = ValidationErrors;
 

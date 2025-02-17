@@ -1004,6 +1004,8 @@ dependencies = [
  "chrono",
  "poem",
  "poem-openapi",
+ "serde",
+ "serde_json",
  "shuttle-poem",
  "shuttle-runtime",
  "tokio",
@@ -1248,6 +1250,7 @@ checksum = "fd2bcaa221d5d64e6830ba4aeaa95eb1421dbe0e5bf55e74509bdacc13a8a04d"
 dependencies = [
  "base64 0.22.1",
  "bytes 1.10.0",
+ "chrono",
  "derive_more",
  "futures-util",
  "indexmap",
@@ -1263,6 +1266,7 @@ dependencies = [
  "serde_yaml",
  "thiserror 2.0.11",
  "tokio",
+ "uuid",
 ]
 
 [[package]]
