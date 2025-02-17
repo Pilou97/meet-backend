@@ -1,0 +1,10 @@
+[package]
+name = "meet-backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+poem = "3.0.0"
+shuttle-poem = "0.52.0"
+shuttle-runtime = "0.52.0"
+tokio = "1.26.0"
