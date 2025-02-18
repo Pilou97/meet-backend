@@ -6,19 +6,6 @@ use poem_openapi::{ApiExtractor, ApiExtractorType, ExtractParamOptions};
 use std::str::FromStr;
 use uuid::Uuid;
 
-// impl<'a> FromRequest<'a> for StudioId {
-//     async fn from_request(
-//         req: &'a poem::Request,
-//         _body: &mut poem::RequestBody,
-//     ) -> poem::Result<Self> {
-//         // TODO: we have to put some extra logic there:
-//         // TODO: use JWT
-//         // TODO: verify the JWT
-//         // TODO: if correct, get the studio (maybe only the id of the Studio is enough)
-
-//     }
-// }
-
 impl<'a> ApiExtractor<'a> for StudioId {
     const TYPES: &'static [ApiExtractorType] = &[ApiExtractorType::Parameter];
     const PARAM_IS_REQUIRED: bool = true;
@@ -59,34 +46,41 @@ impl<'a> ApiExtractor<'a> for StudioId {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use crate::domain::studio::StudioId;
-//     use poem::{handler, http::StatusCode, test::TestClient, Route};
+#[cfg(test)]
+mod tests {
+    use crate::domain::studio::StudioId;
+    use poem::{http::StatusCode, test::TestClient};
+    use poem_openapi::OpenApi;
 
-//     #[handler]
-//     fn authorization(_: StudioId) {}
+    struct TestRouter {}
 
-//     #[tokio::test]
-//     async fn test_auth_ok() {
-//         let app = Route::new().at("/check-auth", authorization);
+    #[OpenApi]
+    impl TestRouter {
+        #[oai(path = "/test", method = "get")]
+        async fn test(&self, _studio_id: StudioId) {}
+    }
 
-//         let cli = TestClient::new(app);
-//         let studio_id = uuid::Uuid::new_v4();
+    #[tokio::test]
+    async fn test_auth_ok() {
+        let api_service = poem_openapi::OpenApiService::new(TestRouter {}, "API", "1.0");
+        let cli = TestClient::new(api_service);
 
-//         let res = cli
-//             .get("/check-auth")
-//             .header("studio", studio_id.to_string())
-//             .send()
-//             .await;
-//         res.assert_status_is_ok();
-//     }
+        let studio_id = uuid::Uuid::new_v4();
 
-//     #[tokio::test]
-//     async fn test_auth_ko() {
-//         let app = Route::new().at("/check-auth", authorization);
-//         let cli = TestClient::new(app);
-//         let res = cli.get("/check-auth").send().await;
-//         res.assert_status(StatusCode::UNAUTHORIZED);
-//     }
-// }
+        let res = cli
+            .get("/test")
+            .header("studio", studio_id.to_string())
+            .send()
+            .await;
+        res.assert_status_is_ok();
+    }
+
+    #[tokio::test]
+    async fn test_auth_ko() {
+        let api_service = poem_openapi::OpenApiService::new(TestRouter {}, "API", "1.0");
+        let cli = TestClient::new(api_service);
+
+        let res = cli.get("/test").send().await;
+        res.assert_status(StatusCode::UNAUTHORIZED);
+    }
+}
