@@ -1,4 +1,7 @@
-use crate::domain::{meeting::Meeting, studio::StudioId};
+use crate::domain::{
+    meeting::{Meeting, MeetingId},
+    studio::StudioId,
+};
 use mockall::automock;
 use std::future::Future;
 use thiserror::Error;
@@ -25,4 +28,9 @@ pub trait MeetingRepository {
         &self,
         studio_id: &StudioId,
     ) -> impl Future<Output = Result<Vec<Meeting>, MeetingRepositoryError>> + Send;
+
+    fn find_meeting(
+        &self,
+        meeting_id: &MeetingId,
+    ) -> impl Future<Output = Result<Option<Meeting>, MeetingRepositoryError>> + Send;
 }

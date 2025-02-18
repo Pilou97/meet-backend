@@ -32,12 +32,16 @@ impl MeetingRepository for Repository {
 
     async fn list_meetings(
         &self,
-        _studio_id: &StudioId,
+        studio_id: &StudioId,
     ) -> Result<Vec<Meeting>, MeetingRepositoryError> {
-        let rows = query!("SELECT id, studio_id, name, date FROM meetings")
-            .fetch_all(&self.pg_pool)
-            .await
-            .map_err(MeetingRepositoryError::from)?;
+        let studio_id = studio_id.as_ref();
+        let rows = query!(
+            "SELECT id, studio_id, name, date FROM meetings where studio_id = $1",
+            studio_id
+        )
+        .fetch_all(&self.pg_pool)
+        .await
+        .map_err(MeetingRepositoryError::from)?;
 
         rows.into_iter()
             .map(|record| {
@@ -51,5 +55,36 @@ impl MeetingRepository for Repository {
             })
             .collect::<Result<Vec<Meeting>, ValidationErrors>>()
             .map_err(MeetingRepositoryError::from)
+    }
+
+    async fn find_meeting(
+        &self,
+        meeting_id: &MeetingId,
+    ) -> Result<Option<Meeting>, MeetingRepositoryError> {
+        let meeting_id = meeting_id.as_ref();
+        let rows = query!(
+            "SELECT id, studio_id, name, date FROM meetings where id = $1",
+            meeting_id
+        )
+        .fetch_optional(&self.pg_pool)
+        .await
+        .map_err(MeetingRepositoryError::from)?;
+
+        let meeting = rows.map(|record| {
+            let name = MeetingName::try_from(record.name)?;
+            Ok(Meeting {
+                id: MeetingId::from(record.id),
+                studio_id: StudioId::from(record.id),
+                name,
+                date: record.date,
+            })
+        });
+        match meeting {
+            Some(res) => match res {
+                Ok(meeting) => Ok(Some(meeting)),
+                Err(err) => Err(err),
+            },
+            None => Ok(None),
+        }
     }
 }

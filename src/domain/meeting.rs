@@ -4,7 +4,7 @@ use validator::{Validate, ValidationErrors};
 
 use super::studio::StudioId;
 
-#[derive(AsRef)]
+#[derive(Debug, AsRef, PartialEq, Clone)]
 pub struct MeetingId(uuid::Uuid);
 
 impl From<uuid::Uuid> for MeetingId {
