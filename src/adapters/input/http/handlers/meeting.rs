@@ -1,9 +1,11 @@
 use super::super::tags::ApiTags;
 use crate::{
-    adapters::input::http::models::meeting::{CreateMeetingRequest, CreateMeetingResponse},
+    adapters::input::http::models::meeting::{
+        CreateMeetingRequest, CreateMeetingResponse, ListMeetingsResponse,
+    },
     domain::studio::StudioId,
     ports::output::meeting_repository::MeetingRepository,
-    services::create_meeting,
+    services::{create_meeting, list_meeting},
 };
 use chrono::Utc;
 use poem::Result;
@@ -28,6 +30,16 @@ where
         let created_meeting =
             create_meeting(&self.repository, body.name, body.date, studio_id, today).await?;
         Ok(Json(created_meeting.into()))
+    }
+
+    #[oai(path = "/meetings", method = "get", tag = "ApiTags::Meeting")]
+    pub async fn list_meetings(
+        &self,
+        #[oai(name = "studio")] studio_id: StudioId,
+    ) -> Result<Json<ListMeetingsResponse>> {
+        let today = Utc::now();
+        let meetings = list_meeting(&self.repository, studio_id, today).await?;
+        Ok(Json(ListMeetingsResponse::from(meetings)))
     }
 }
 
@@ -125,7 +137,7 @@ mod tests {
     }
 
     #[tokio::test]
-    pub async fn test_authorization() {
+    pub async fn test_authorization_is_needed() {
         let app = app(config(), MockMeetingRepository::new()).await.unwrap();
 
         let cli = TestClient::new(app);

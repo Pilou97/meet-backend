@@ -59,12 +59,14 @@ impl ToJSON for MeetingName {
 }
 
 #[derive(Object)]
-pub struct CreateMeetingResponse {
+pub struct MeetingHttp {
     id: uuid::Uuid,
     studio_id: uuid::Uuid,
     name: MeetingName,
     date: DateTime<Utc>,
 }
+
+pub type CreateMeetingResponse = MeetingHttp;
 
 impl From<Meeting> for CreateMeetingResponse {
     fn from(value: Meeting) -> Self {
@@ -73,6 +75,19 @@ impl From<Meeting> for CreateMeetingResponse {
             studio_id: value.studio_id.as_ref().clone(),
             name: value.name,
             date: value.date,
+        }
+    }
+}
+
+#[derive(Object)]
+pub struct ListMeetingsResponse {
+    meetings: Vec<MeetingHttp>,
+}
+
+impl From<Vec<Meeting>> for ListMeetingsResponse {
+    fn from(meetings: Vec<Meeting>) -> Self {
+        ListMeetingsResponse {
+            meetings: meetings.into_iter().map(MeetingHttp::from).collect(),
         }
     }
 }
