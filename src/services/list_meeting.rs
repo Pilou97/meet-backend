@@ -67,7 +67,7 @@ mod tests {
         assert_eq!(meetings.len(), 1);
         assert!(meetings.iter().all(|meeting| meeting.date > Utc::now()));
         assert_eq!(
-            meetings.iter().next().unwrap().name.as_ref(),
+            meetings.first().unwrap().name.as_ref(),
             "I am the fresh new one"
         );
     }

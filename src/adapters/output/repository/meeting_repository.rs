@@ -1,4 +1,4 @@
-use super::repository::Repository;
+use super::db::Repository;
 use crate::{
     domain::{
         meeting::{Meeting, MeetingId, MeetingName},

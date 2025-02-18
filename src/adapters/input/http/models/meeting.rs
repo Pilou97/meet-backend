@@ -43,11 +43,10 @@ impl ParseFromJSON for MeetingName {
     fn parse_from_json(value: Option<Value>) -> poem_openapi::types::ParseResult<Self> {
         let value = value.unwrap_or_default();
         if let Value::String(string) = value {
-            let meeting_name =
-                MeetingName::try_from(string).map_err(|err| ParseError::from(err))?;
+            let meeting_name = MeetingName::try_from(string).map_err(ParseError::from)?;
             ParseResult::Ok(meeting_name)
         } else {
-            return ParseResult::Err(ParseError::expected_type(value));
+            ParseResult::Err(ParseError::expected_type(value))
         }
     }
 }
@@ -71,8 +70,8 @@ pub type CreateMeetingResponse = MeetingHttp;
 impl From<Meeting> for CreateMeetingResponse {
     fn from(value: Meeting) -> Self {
         CreateMeetingResponse {
-            id: value.id.as_ref().clone(),
-            studio_id: value.studio_id.as_ref().clone(),
+            id: *value.id.as_ref(),
+            studio_id: *value.studio_id.as_ref(),
             name: value.name,
             date: value.date,
         }

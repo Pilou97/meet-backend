@@ -1,4 +1,4 @@
-use adapters::output::repository::repository::Repository;
+use adapters::output::repository::db::Repository;
 use anyhow::Context;
 use app::app;
 use config::Config;

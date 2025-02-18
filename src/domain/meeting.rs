@@ -19,6 +19,12 @@ impl MeetingId {
     }
 }
 
+impl Default for MeetingId {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Validate, AsRef)]
 pub struct MeetingName {
     #[validate(length(min = 1, message = "Name cannot be empty"))]

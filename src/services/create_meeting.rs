@@ -135,7 +135,7 @@ mod test {
             .with(eq(studio_id.clone()))
             .returning(move |studio_id| {
                 let studio_id = studio_id.clone();
-                let date = date.clone();
+                let date = date;
                 Box::pin(async move {
                     Ok(vec![Meeting {
                         id: MeetingId::new(),
