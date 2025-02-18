@@ -9,7 +9,3 @@ impl From<Uuid> for StudioId {
         StudioId(uuid)
     }
 }
-
-pub struct Studio {
-    id: StudioId,
-}
