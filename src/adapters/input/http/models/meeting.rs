@@ -1,4 +1,4 @@
-use crate::domain::meeting::MeetingName;
+use crate::domain::meeting::{Meeting, MeetingName};
 use chrono::{DateTime, Utc};
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -55,5 +55,24 @@ impl ParseFromJSON for MeetingName {
 impl ToJSON for MeetingName {
     fn to_json(&self) -> Option<Value> {
         Some(Value::String(self.as_ref().to_string()))
+    }
+}
+
+#[derive(Object)]
+pub struct CreateMeetingResponse {
+    id: uuid::Uuid,
+    studio_id: uuid::Uuid,
+    name: MeetingName,
+    date: DateTime<Utc>,
+}
+
+impl From<Meeting> for CreateMeetingResponse {
+    fn from(value: Meeting) -> Self {
+        CreateMeetingResponse {
+            id: value.id.as_ref().clone(),
+            studio_id: value.studio_id.as_ref().clone(),
+            name: value.name,
+            date: value.date,
+        }
     }
 }

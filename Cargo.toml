@@ -7,6 +7,7 @@ edition = "2021"
 anyhow = "1.0.95"
 chrono = "0.4.39"
 derive_more = {version = "2.0.1", features=["as_ref"]}
+mockall = "0.13.1"
 poem = { version = "3.0.0", features = ["test"] }
 poem-openapi = { version = "5.1.5", features = [
     "swagger-ui",
@@ -18,6 +19,7 @@ serde_json = "1.0.138"
 shuttle-common = "0.52.0"
 shuttle-poem = "0.52.0"
 shuttle-runtime = "0.52.0"
+shuttle-shared-db = {version = "0.52.0", features=["sqlx", "postgres"]}
 sqlx = { version = "0.8.3", features = [
     "macros",
     "postgres",

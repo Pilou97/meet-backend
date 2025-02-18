@@ -1,8 +1,6 @@
-use std::str::FromStr;
-
-use poem::{http::StatusCode, FromRequest};
-
 use crate::domain::studio::StudioId;
+use poem::{http::StatusCode, FromRequest};
+use std::str::FromStr;
 
 impl<'a> FromRequest<'a> for StudioId {
     async fn from_request(

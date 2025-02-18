@@ -13,6 +13,12 @@ impl From<uuid::Uuid> for MeetingId {
     }
 }
 
+impl MeetingId {
+    pub fn new() -> Self {
+        MeetingId::from(uuid::Uuid::new_v4())
+    }
+}
+
 #[derive(Validate, AsRef)]
 pub struct MeetingName {
     #[validate(length(min = 1, message = "Name cannot be empty"))]

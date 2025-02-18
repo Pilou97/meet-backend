@@ -11,7 +11,6 @@ create a file named `Secrets.dev.toml` and put:
 
 ```bash
 SWAGGER_URI = "localhost:8000"
-DATABASE_URL = "postgresql://postgres:azerty@localhost/postgres"
 ```
 
 Then you need to enable sqlx macros:

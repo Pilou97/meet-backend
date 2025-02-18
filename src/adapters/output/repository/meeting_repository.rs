@@ -10,10 +10,7 @@ use sqlx::query;
 use validator::ValidationErrors;
 
 impl MeetingRepository for Repository {
-    async fn create_meeting<'a>(
-        &self,
-        meeting: &'a Meeting,
-    ) -> Result<&'a Meeting, MeetingRepositoryError> {
+    async fn create_meeting(&self, meeting: &Meeting) -> Result<(), MeetingRepositoryError> {
         let meeting_id = meeting.id.as_ref();
         let studio_id = meeting.studio_id.as_ref();
         let meeting_name = meeting.name.as_ref();
@@ -30,10 +27,10 @@ impl MeetingRepository for Repository {
         .await
         .map_err(MeetingRepositoryError::from)?;
 
-        Ok(meeting)
+        Ok(())
     }
 
-    async fn list_meeting(
+    async fn list_meetings(
         &self,
         _studio_id: &StudioId,
     ) -> Result<Vec<Meeting>, MeetingRepositoryError> {

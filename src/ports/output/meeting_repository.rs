@@ -1,4 +1,5 @@
 use crate::domain::{meeting::Meeting, studio::StudioId};
+use mockall::automock;
 use std::future::Future;
 use thiserror::Error;
 use validator::ValidationErrors;
@@ -13,14 +14,15 @@ pub enum MeetingRepositoryError {
     Validation(#[from] ValidationErrors),
 }
 
+#[automock]
 pub trait MeetingRepository {
-    fn create_meeting<'a>(
+    fn create_meeting(
         &self,
-        meeting: &'a Meeting,
-    ) -> impl Future<Output = Result<&'a Meeting, MeetingRepositoryError>>;
+        meeting: &Meeting,
+    ) -> impl Future<Output = Result<(), MeetingRepositoryError>> + Send;
 
-    fn list_meeting(
+    fn list_meetings(
         &self,
         studio_id: &StudioId,
-    ) -> impl Future<Output = Result<Vec<Meeting>, MeetingRepositoryError>>;
+    ) -> impl Future<Output = Result<Vec<Meeting>, MeetingRepositoryError>> + Send;
 }
