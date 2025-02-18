@@ -21,7 +21,7 @@ where
     #[oai(path = "/meetings", method = "post", tag = "ApiTags::Meeting")]
     pub async fn create_meeting(
         &self,
-        studio_id: StudioId,
+        #[oai(name = "studio")] studio_id: StudioId,
         Json(body): Json<CreateMeetingRequest>,
     ) -> Result<Json<CreateMeetingResponse>> {
         let today = Utc::now();
@@ -35,20 +35,25 @@ where
 mod tests {
     use std::collections::BTreeMap;
 
-    use crate::{app, config::Config, ports::output::meeting_repository::MockMeetingRepository};
+    use crate::{
+        app, config::Config, domain::studio::StudioId,
+        ports::output::meeting_repository::MockMeetingRepository,
+    };
+    use chrono::{Days, Utc};
+    use mockall::predicate::eq;
     use poem::{http::StatusCode, test::TestClient};
     use serde::Serialize;
     use shuttle_common::secrets::Secret;
     use shuttle_runtime::SecretStore;
 
     #[derive(Serialize)]
-    struct Body {
-        name: &'static str,
-        date: &'static str,
+    struct Body<'a> {
+        name: &'a str,
+        date: &'a str,
     }
 
-    fn token() -> String {
-        uuid::Uuid::new_v4().to_string()
+    fn token(studio_id: StudioId) -> String {
+        studio_id.as_ref().to_string()
     }
 
     fn config() -> Config {
@@ -67,20 +72,39 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_payload_parsing_ok() {
-        let app = app(config(), MockMeetingRepository::new()).await.unwrap();
+        let studio_id = StudioId::from(uuid::Uuid::new_v4());
+
+        let mut mock_repo = MockMeetingRepository::new();
+        mock_repo
+            .expect_create_meeting()
+            .once()
+            .return_once(|_| Box::pin(async { Ok(()) }));
+
+        mock_repo
+            .expect_list_meetings()
+            .once()
+            .with(eq(studio_id.clone()))
+            .return_once(|_| Box::pin(async { Ok(vec![]) }));
+
+        let app = app(config(), mock_repo).await.unwrap();
 
         let cli = TestClient::new(app);
+
+        let date = Utc::now()
+            .checked_add_days(Days::new(2))
+            .unwrap()
+            .to_string();
+
         let res = cli
             .post("/api/meetings")
             .body_json(&Body {
                 name: "Meeting name",
-                date: "2025-02-17T17:50:41.777Z",
+                date: date.as_str(),
             })
-            .header("studio", token())
+            .header("studio", token(studio_id))
             .send()
             .await;
         res.assert_status_is_ok();
-        res.assert_text("\"Hello meeting!!\"").await;
     }
 
     #[tokio::test]
@@ -94,7 +118,7 @@ mod tests {
                 name: "",
                 date: "2025-02-17T17:50:41.777Z",
             })
-            .header("studio", token())
+            .header("studio", token(StudioId::from(uuid::Uuid::new_v4())))
             .send()
             .await;
         res.assert_status(StatusCode::BAD_REQUEST);
