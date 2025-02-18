@@ -13,5 +13,5 @@ pub trait RoomManager {
     fn create_token(
         &self,
         meeting_id: MeetingId,
-    ) -> impl Future<Output = Result<RoomToken, RoomManagerError>>;
+    ) -> impl Future<Output = Result<RoomToken, RoomManagerError>> + Send;
 }

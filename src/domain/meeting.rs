@@ -5,7 +5,7 @@ use validator::{Validate, ValidationErrors};
 use super::studio::StudioId;
 
 #[derive(Debug, AsRef, PartialEq, Clone)]
-pub struct MeetingId(uuid::Uuid);
+pub struct MeetingId(pub uuid::Uuid);
 
 impl From<uuid::Uuid> for MeetingId {
     fn from(id: uuid::Uuid) -> Self {

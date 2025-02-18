@@ -3,6 +3,7 @@ use anyhow::Context;
 use app::app;
 use config::Config;
 use poem::handler;
+use ports::output::room_manager::MockRoomManager;
 use shuttle_poem::ShuttlePoem;
 use sqlx::PgPool;
 
@@ -29,7 +30,9 @@ async fn main(
         .await
         .context("Cannot instanciate the repository")?;
 
-    let app = app(config, repository).await?;
+    let room_manager = MockRoomManager::new();
+
+    let app = app(config, repository, room_manager).await?;
 
     Ok(app.into())
 }

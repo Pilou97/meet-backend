@@ -15,7 +15,9 @@ mod tests {
     use std::collections::BTreeMap;
 
     use crate::{
-        app::app, config::Config, ports::output::meeting_repository::MockMeetingRepository,
+        app::app,
+        config::Config,
+        ports::output::{meeting_repository::MockMeetingRepository, room_manager::MockRoomManager},
     };
     use poem::test::TestClient;
     use shuttle_common::secrets::Secret;
@@ -37,7 +39,13 @@ mod tests {
 
     #[tokio::test]
     async fn test_hello() {
-        let app = app(config(), MockMeetingRepository::new()).await.unwrap();
+        let app = app(
+            config(),
+            MockMeetingRepository::new(),
+            MockRoomManager::new(),
+        )
+        .await
+        .unwrap();
 
         let cli = TestClient::new(app);
         let res = cli.get("/api/hello").send().await;

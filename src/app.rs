@@ -1,17 +1,28 @@
 use crate::{
     adapters::input::http::handlers::{hello::HelloRouter, meeting::MeetingRouter},
     config::Config,
-    ports::output::meeting_repository::MeetingRepository,
+    ports::output::{meeting_repository::MeetingRepository, room_manager::RoomManager},
 };
 use anyhow::Error;
 use poem::{middleware::Cors, Endpoint, EndpointExt, Route};
 
-pub async fn app<R>(config: Config, repository: R) -> Result<impl Endpoint, Error>
+pub async fn app<R, M>(
+    config: Config,
+    repository: R,
+    room_manager: M,
+) -> Result<impl Endpoint, Error>
 where
     R: MeetingRepository + Send + Sync + 'static,
+    M: RoomManager + Send + Sync + 'static,
 {
     let api_service = poem_openapi::OpenApiService::new(
-        (MeetingRouter { repository }, HelloRouter {}),
+        (
+            MeetingRouter {
+                repository,
+                room_manager,
+            },
+            HelloRouter {},
+        ),
         "API",
         "1.0",
     )

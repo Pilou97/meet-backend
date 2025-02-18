@@ -1,24 +1,26 @@
 use super::super::tags::ApiTags;
 use crate::{
     adapters::input::http::models::meeting::{
-        CreateMeetingRequest, CreateMeetingResponse, ListMeetingsResponse,
+        CreateMeetingRequest, CreateMeetingResponse, JoinMeetingResponse, ListMeetingsResponse,
     },
-    domain::studio::StudioId,
-    ports::output::meeting_repository::MeetingRepository,
-    services::{create_meeting, list_meeting},
+    domain::{meeting::MeetingId, studio::StudioId},
+    ports::output::{meeting_repository::MeetingRepository, room_manager::RoomManager},
+    services::{create_meeting, join_meeting, list_meeting},
 };
 use chrono::Utc;
 use poem::Result;
-use poem_openapi::{payload::Json, OpenApi};
+use poem_openapi::{param::Path, payload::Json, OpenApi};
 
-pub struct MeetingRouter<R> {
+pub struct MeetingRouter<R, M> {
     pub repository: R,
+    pub room_manager: M,
 }
 
 #[OpenApi]
-impl<R> MeetingRouter<R>
+impl<R, M> MeetingRouter<R, M>
 where
     R: MeetingRepository + Send + Sync + 'static,
+    M: RoomManager + Send + Sync + 'static,
 {
     #[oai(path = "/meetings", method = "post", tag = "ApiTags::Meeting")]
     pub async fn create_meeting(
@@ -41,6 +43,20 @@ where
         let meetings = list_meeting(&self.repository, studio_id, today).await?;
         Ok(Json(ListMeetingsResponse::from(meetings)))
     }
+
+    #[oai(
+        path = "/meetings/:meeting-id/join",
+        method = "get",
+        tag = "ApiTags::Meeting"
+    )]
+    pub async fn join_meeting(
+        &self,
+        Path(meeting_id): Path<MeetingId>,
+    ) -> Result<Json<JoinMeetingResponse>> {
+        let today = Utc::now();
+        let token = join_meeting(&self.repository, &self.room_manager, meeting_id, today).await?;
+        Ok(Json(JoinMeetingResponse::from(token)))
+    }
 }
 
 #[cfg(test)]
@@ -48,8 +64,10 @@ mod tests {
     use std::collections::BTreeMap;
 
     use crate::{
-        app, config::Config, domain::studio::StudioId,
-        ports::output::meeting_repository::MockMeetingRepository,
+        app,
+        config::Config,
+        domain::studio::StudioId,
+        ports::output::{meeting_repository::MockMeetingRepository, room_manager::MockRoomManager},
     };
     use chrono::{Days, Utc};
     use mockall::predicate::eq;
@@ -98,7 +116,9 @@ mod tests {
             .with(eq(studio_id.clone()))
             .return_once(|_| Box::pin(async { Ok(vec![]) }));
 
-        let app = app(config(), mock_repo).await.unwrap();
+        let app = app(config(), mock_repo, MockRoomManager::new())
+            .await
+            .unwrap();
 
         let cli = TestClient::new(app);
 
@@ -121,7 +141,13 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_payload_parsing_fail_name_is_empty() {
-        let app = app(config(), MockMeetingRepository::new()).await.unwrap();
+        let app = app(
+            config(),
+            MockMeetingRepository::new(),
+            MockRoomManager::new(),
+        )
+        .await
+        .unwrap();
 
         let cli = TestClient::new(app);
         let res = cli
@@ -138,7 +164,13 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_authorization_is_needed() {
-        let app = app(config(), MockMeetingRepository::new()).await.unwrap();
+        let app = app(
+            config(),
+            MockMeetingRepository::new(),
+            MockRoomManager::new(),
+        )
+        .await
+        .unwrap();
 
         let cli = TestClient::new(app);
         let res = cli

@@ -1,4 +1,7 @@
-use crate::domain::meeting::{Meeting, MeetingName};
+use crate::domain::{
+    meeting::{Meeting, MeetingName},
+    room::RoomToken,
+};
 use chrono::{DateTime, Utc};
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -87,6 +90,19 @@ impl From<Vec<Meeting>> for ListMeetingsResponse {
     fn from(meetings: Vec<Meeting>) -> Self {
         ListMeetingsResponse {
             meetings: meetings.into_iter().map(MeetingHttp::from).collect(),
+        }
+    }
+}
+
+#[derive(Object)]
+pub struct JoinMeetingResponse {
+    token: String,
+}
+
+impl From<RoomToken> for JoinMeetingResponse {
+    fn from(value: RoomToken) -> Self {
+        JoinMeetingResponse {
+            token: value.as_ref().to_string(),
         }
     }
 }
