@@ -38,3 +38,32 @@ impl ParseFromParameter for MeetingId {
         Ok(MeetingId::from(uuid))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::domain::meeting::MeetingId;
+    use poem::test::TestClient;
+    use poem_openapi::{param::Path, OpenApi};
+
+    struct TestRouter {}
+
+    #[OpenApi]
+    impl TestRouter {
+        #[allow(unused)]
+        #[oai(path = "/test/:meeting_id", method = "get")]
+        async fn test(&self, #[allow(unused)] Path(meeting_id): Path<MeetingId>) {}
+    }
+
+    #[tokio::test]
+    async fn test_parsing_meeting_id() {
+        let api_service = poem_openapi::OpenApiService::new(TestRouter {}, "API", "1.0");
+        let cli = TestClient::new(api_service);
+        let meeting_id = MeetingId::new();
+
+        let res = cli
+            .get(format!("/test/{}", meeting_id.as_ref().to_string()))
+            .send()
+            .await;
+        res.assert_status_is_ok();
+    }
+}
