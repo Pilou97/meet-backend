@@ -6,6 +6,7 @@ use shuttle_poem::ShuttlePoem;
 pub mod adapters;
 pub mod app;
 pub mod domain;
+pub mod ports;
 
 #[handler]
 fn hello_world() -> &'static str {

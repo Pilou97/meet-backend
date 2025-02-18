@@ -1,6 +1,8 @@
 use chrono::{DateTime, Utc};
 use validator::{Validate, ValidationErrors};
 
+use super::studio::StudioId;
+
 pub struct MeetingId(uuid::Uuid);
 
 impl From<uuid::Uuid> for MeetingId {
@@ -33,6 +35,7 @@ impl TryFrom<String> for MeetingName {
 
 pub struct Meeting {
     pub id: MeetingId,
+    pub studio_id: StudioId,
     pub name: MeetingName,
     pub date: DateTime<Utc>,
 }

@@ -1,8 +1,11 @@
 use super::super::tags::ApiTags;
 use crate::{
-    adapters::input::http::models::meeting::CreateMeetingRequest, domain::studio::StudioId,
+    adapters::{
+        input::http::models::meeting::CreateMeetingRequest, output::repository::Repository,
+    },
+    domain::studio::StudioId,
 };
-use poem::Result;
+use poem::{web::Data, Result};
 use poem_openapi::{payload::Json, OpenApi};
 
 pub struct MeetingRouter {}
@@ -14,6 +17,7 @@ impl MeetingRouter {
         &self,
         _studio: StudioId,
         _body: Json<CreateMeetingRequest>,
+        _db: Data<&Repository>,
     ) -> Result<Json<String>> {
         Ok(Json("Hello meeting!!".to_string()))
     }
