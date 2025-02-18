@@ -1210,11 +1210,13 @@ dependencies = [
  "poem-openapi",
  "serde",
  "serde_json",
+ "shuttle-common",
  "shuttle-poem",
  "shuttle-runtime",
  "sqlx",
  "thiserror 2.0.11",
  "tokio",
+ "url",
  "uuid",
  "validator",
 ]

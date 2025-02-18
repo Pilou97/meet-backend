@@ -27,13 +27,18 @@ where
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
     use crate::{
         app,
+        config::Config,
         domain::meeting::Meeting,
         ports::output::meeting_repository::{MeetingRepository, MeetingRepositoryError},
     };
     use poem::{http::StatusCode, test::TestClient};
     use serde::Serialize;
+    use shuttle_common::secrets::Secret;
+    use shuttle_runtime::SecretStore;
 
     #[derive(Clone)]
     struct MockRepo {}
@@ -65,11 +70,23 @@ mod tests {
         uuid::Uuid::new_v4().to_string()
     }
 
+    fn config() -> Config {
+        let mut map = BTreeMap::new();
+        map.insert(
+            "SWAGGER_URI".to_string(),
+            Secret::from("http://localhost:8000".to_string()),
+        );
+        map.insert(
+            "DATABASE_URI".to_string(),
+            Secret::from("postgres://test@test.com".to_string()),
+        );
+        let secrets = SecretStore::new(map);
+        Config::new(secrets).unwrap()
+    }
+
     #[tokio::test]
     pub async fn test_payload_parsing_ok() {
-        let app = app("http".into(), "localhost".into(), Some(8000), MockRepo {})
-            .await
-            .unwrap();
+        let app = app(config(), MockRepo {}).await.unwrap();
 
         let cli = TestClient::new(app);
         let res = cli
@@ -87,9 +104,7 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_payload_parsing_fail_name_is_empty() {
-        let app = app("http".into(), "localhost".into(), Some(8000), MockRepo {})
-            .await
-            .unwrap();
+        let app = app(config(), MockRepo {}).await.unwrap();
 
         let cli = TestClient::new(app);
         let res = cli
@@ -106,9 +121,7 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_authorization() {
-        let app = app("http".into(), "localhost".into(), Some(8000), MockRepo {})
-            .await
-            .unwrap();
+        let app = app(config(), MockRepo {}).await.unwrap();
 
         let cli = TestClient::new(app);
         let res = cli

@@ -1,11 +1,13 @@
 use adapters::output::repository::Repository;
 use anyhow::Context;
 use app::app;
+use config::Config;
 use poem::handler;
 use shuttle_poem::ShuttlePoem;
 
 pub mod adapters;
 pub mod app;
+pub mod config;
 pub mod domain;
 pub mod ports;
 
@@ -18,24 +20,13 @@ fn hello_world() -> &'static str {
 async fn main(
     #[shuttle_runtime::Secrets] secrets: shuttle_runtime::SecretStore,
 ) -> ShuttlePoem<impl poem::Endpoint> {
-    let scheme = secrets.get("SCHEME").unwrap_or("http".into());
-    let host = secrets
-        .get("HOST")
-        .context("The HOST variable has to be defined")?;
+    let config = Config::new(secrets)?;
 
-    let port = {
-        let port = secrets.get("PORT");
-        match port {
-            None => None,
-            Some(port) => Some(port.parse::<u16>().context("The PORT is not valid")?),
-        }
-    };
-
-    let repository = Repository::new("Hello world".into())
+    let repository = Repository::new(&config.database_uri)
         .await
         .context("Cannot instanciate the repository")?;
 
-    let app = app(scheme, host, port, repository).await?;
+    let app = app(config, repository).await?;
 
     Ok(app.into())
 }
