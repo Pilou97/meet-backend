@@ -10,8 +10,8 @@
 create a file named `Secrets.dev.toml` and put:
 
 `
-HOST = "localhost"
-PORT = "8000"
+SWAGGER_URI = "localhost:8000"
+DATABASE_URI = "postgresql://postgres:azerty@localhost/postgres"
 `
 
 Then start the project by running:
