@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT id, studio_id, name, date FROM meetings",
+  "query": "SELECT id, studio_id, name, date FROM meetings where id = $1",
   "describe": {
     "columns": [
       {
@@ -25,7 +25,9 @@
       }
     ],
     "parameters": {
-      "Left": []
+      "Left": [
+        "Uuid"
+      ]
     },
     "nullable": [
       false,
@@ -34,5 +36,5 @@
       false
     ]
   },
-  "hash": "b0c1e93e99567ceac49c616e4178f20925a37c68c83bee72c23a0899fb4b5586"
+  "hash": "84da03ce37e06f706e2731bfd2762f0cb08b42d243d1f58eb7dbbb491dc105a2"
 }
