@@ -51,7 +51,7 @@ mod tests {
             Secret::from("http://localhost:8000".to_string()),
         );
         map.insert(
-            "DATABASE_URI".to_string(),
+            "DATABASE_URL".to_string(),
             Secret::from("postgres://test@test.com".to_string()),
         );
         let secrets = SecretStore::new(map);

@@ -1,8 +1,10 @@
 use chrono::{DateTime, Utc};
+use derive_more::AsRef;
 use validator::{Validate, ValidationErrors};
 
 use super::studio::StudioId;
 
+#[derive(AsRef)]
 pub struct MeetingId(uuid::Uuid);
 
 impl From<uuid::Uuid> for MeetingId {
@@ -11,16 +13,10 @@ impl From<uuid::Uuid> for MeetingId {
     }
 }
 
-#[derive(Validate)]
+#[derive(Validate, AsRef)]
 pub struct MeetingName {
     #[validate(length(min = 1, message = "Name cannot be empty"))]
     inner: String,
-}
-
-impl AsRef<String> for MeetingName {
-    fn as_ref(&self) -> &String {
-        &self.inner
-    }
 }
 
 impl TryFrom<String> for MeetingName {

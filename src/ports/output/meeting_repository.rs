@@ -1,11 +1,17 @@
 use crate::domain::{meeting::Meeting, studio::StudioId};
 use std::future::Future;
 use thiserror::Error;
+use validator::ValidationErrors;
 
 /// TODO: find a good way to abstract error from sqlx in trait/error definition
 
 #[derive(Error, Debug)]
-pub enum MeetingRepositoryError {}
+pub enum MeetingRepositoryError {
+    #[error(transparent)]
+    SqlxError(#[from] sqlx::Error),
+    #[error(transparent)]
+    Validation(#[from] ValidationErrors),
+}
 
 pub trait MeetingRepository {
     fn create_meeting<'a>(

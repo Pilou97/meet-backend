@@ -1,9 +1,9 @@
 use anyhow::Context;
-use sqlx::{migrate, postgres::PgPoolOptions, Pool, Postgres};
+use sqlx::{postgres::PgPoolOptions, Pool, Postgres};
 
 #[derive(Clone)]
 pub struct Repository {
-    pg_pool: Pool<Postgres>,
+    pub pg_pool: Pool<Postgres>,
 }
 
 impl Repository {
@@ -13,11 +13,6 @@ impl Repository {
             .connect(uri.as_str())
             .await
             .context("Cannot connect to postgresql database")?;
-
-        migrate!("./migrations")
-            .run(&pg_pool)
-            .await
-            .context("The database migration failed")?;
 
         Ok(Repository { pg_pool })
     }

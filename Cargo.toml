@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.95"
 chrono = "0.4.39"
+derive_more = {version = "2.0.1", features=["as_ref"]}
 poem = { version = "3.0.0", features = ["test"] }
 poem-openapi = { version = "5.1.5", features = [
     "swagger-ui",

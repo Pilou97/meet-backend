@@ -1,4 +1,4 @@
-use adapters::output::repository::Repository;
+use adapters::output::repository::repository::Repository;
 use anyhow::Context;
 use app::app;
 use config::Config;
@@ -22,7 +22,7 @@ async fn main(
 ) -> ShuttlePoem<impl poem::Endpoint> {
     let config = Config::new(secrets)?;
 
-    let repository = Repository::new(&config.database_uri)
+    let repository = Repository::new(&config.database_url)
         .await
         .context("Cannot instanciate the repository")?;
 

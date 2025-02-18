@@ -9,14 +9,19 @@
 
 create a file named `Secrets.dev.toml` and put:
 
-`
+```bash
 SWAGGER_URI = "localhost:8000"
-DATABASE_URI = "postgresql://postgres:azerty@localhost/postgres"
-`
+DATABASE_URL = "postgresql://postgres:azerty@localhost/postgres"
+```
 
-Then start the project by running:
+Then you need to enable sqlx macros:
+ - by adding a `DATABASE_URL` in your environment
+ - by running `cargo sqlx migrate run`
+
+You can now compile the project by running `cargo build`
+
+And you can run it using:
 
 `shuttle run --secrets Secrets.dev.toml`
 
 > shuttle run --secrets Secrets.dev.toml --port 8081
-> Don't forget to change the port in your Secrets.toml
