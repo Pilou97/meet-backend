@@ -1,3 +1,4 @@
+use adapters::output::repository::Repository;
 use anyhow::Context;
 use app::app;
 use poem::handler;
@@ -30,5 +31,11 @@ async fn main(
         }
     };
 
-    Ok(app(scheme, host, port).into())
+    let repository = Repository::new("Hello world".into())
+        .await
+        .context("Cannot instanciate the repository")?;
+
+    let app = app(scheme, host, port, repository).await?;
+
+    Ok(app.into())
 }

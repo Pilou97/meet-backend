@@ -12,13 +12,38 @@ impl HelloRouter {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        app::app,
+        domain::meeting::Meeting,
+        ports::output::meeting_repository::{MeetingRepository, MeetingRepositoryError},
+    };
     use poem::test::TestClient;
 
-    use crate::app::app;
+    #[derive(Clone)]
+    struct MockRepo {}
+
+    /// TODO: see if can derive it with a crate or not
+    impl MeetingRepository for MockRepo {
+        async fn create_meeting<'a>(
+            &self,
+            _meeting: &'a Meeting,
+        ) -> Result<&'a Meeting, MeetingRepositoryError> {
+            todo!()
+        }
+
+        async fn list_meeting(
+            &self,
+            _studio_id: &crate::domain::studio::StudioId,
+        ) -> Result<Vec<Meeting>, MeetingRepositoryError> {
+            todo!()
+        }
+    }
 
     #[tokio::test]
     async fn test_hello() {
-        let app = app("http".into(), "localhost".into(), Some(8000));
+        let app = app("http".into(), "localhost".into(), Some(8000), MockRepo {})
+            .await
+            .unwrap();
 
         let cli = TestClient::new(app);
         let res = cli.get("/api/hello").send().await;

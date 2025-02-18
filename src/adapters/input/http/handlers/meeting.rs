@@ -1,23 +1,25 @@
 use super::super::tags::ApiTags;
 use crate::{
-    adapters::{
-        input::http::models::meeting::CreateMeetingRequest, output::repository::Repository,
-    },
-    domain::studio::StudioId,
+    adapters::input::http::models::meeting::CreateMeetingRequest, domain::studio::StudioId,
+    ports::output::meeting_repository::MeetingRepository,
 };
-use poem::{web::Data, Result};
+use poem::Result;
 use poem_openapi::{payload::Json, OpenApi};
 
-pub struct MeetingRouter {}
+pub struct MeetingRouter<R> {
+    pub repository: R,
+}
 
 #[OpenApi]
-impl MeetingRouter {
+impl<R> MeetingRouter<R>
+where
+    R: MeetingRepository + Send + Sync + 'static,
+{
     #[oai(path = "/meetings", method = "post", tag = "ApiTags::Meeting")]
     pub async fn create_meeting(
         &self,
         _studio: StudioId,
         _body: Json<CreateMeetingRequest>,
-        _db: Data<&Repository>,
     ) -> Result<Json<String>> {
         Ok(Json("Hello meeting!!".to_string()))
     }
@@ -25,10 +27,33 @@ impl MeetingRouter {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        app,
+        domain::meeting::Meeting,
+        ports::output::meeting_repository::{MeetingRepository, MeetingRepositoryError},
+    };
     use poem::{http::StatusCode, test::TestClient};
     use serde::Serialize;
 
-    use crate::app;
+    #[derive(Clone)]
+    struct MockRepo {}
+
+    /// TODO: see if can derive it with a crate or not
+    impl MeetingRepository for MockRepo {
+        async fn create_meeting<'a>(
+            &self,
+            _meeting: &'a Meeting,
+        ) -> Result<&'a Meeting, MeetingRepositoryError> {
+            todo!()
+        }
+
+        async fn list_meeting(
+            &self,
+            _studio_id: &crate::domain::studio::StudioId,
+        ) -> Result<Vec<Meeting>, MeetingRepositoryError> {
+            todo!()
+        }
+    }
 
     #[derive(Serialize)]
     struct Body {
@@ -42,7 +67,9 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_payload_parsing_ok() {
-        let app = app("http".into(), "localhost".into(), Some(8000));
+        let app = app("http".into(), "localhost".into(), Some(8000), MockRepo {})
+            .await
+            .unwrap();
 
         let cli = TestClient::new(app);
         let res = cli
@@ -55,11 +82,14 @@ mod tests {
             .send()
             .await;
         res.assert_status_is_ok();
+        res.assert_text("\"Hello meeting!!\"").await;
     }
 
     #[tokio::test]
     pub async fn test_payload_parsing_fail_name_is_empty() {
-        let app = app("http".into(), "localhost".into(), Some(8000));
+        let app = app("http".into(), "localhost".into(), Some(8000), MockRepo {})
+            .await
+            .unwrap();
 
         let cli = TestClient::new(app);
         let res = cli
@@ -76,7 +106,9 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_authorization() {
-        let app = app("http".into(), "localhost".into(), Some(8000));
+        let app = app("http".into(), "localhost".into(), Some(8000), MockRepo {})
+            .await
+            .unwrap();
 
         let cli = TestClient::new(app);
         let res = cli

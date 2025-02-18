@@ -2268,6 +2268,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a007b6936676aa9ab40207cde35daab0a04b823be8ae004368c0793b96a61e0"
 dependencies = [
  "bytes 1.10.0",
+ "chrono",
  "crc",
  "crossbeam-queue",
  "either",
@@ -2290,6 +2291,7 @@ dependencies = [
  "thiserror 2.0.11",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
@@ -2341,6 +2343,7 @@ dependencies = [
  "bitflags",
  "byteorder",
  "bytes 1.10.0",
+ "chrono",
  "crc",
  "digest",
  "dotenvy",
@@ -2369,6 +2372,7 @@ dependencies = [
  "stringprep",
  "thiserror 2.0.11",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2382,6 +2386,7 @@ dependencies = [
  "base64 0.22.1",
  "bitflags",
  "byteorder",
+ "chrono",
  "crc",
  "dotenvy",
  "etcetera",
@@ -2406,6 +2411,7 @@ dependencies = [
  "stringprep",
  "thiserror 2.0.11",
  "tracing",
+ "uuid",
  "whoami",
 ]
 
@@ -2416,6 +2422,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f85ca71d3a5b24e64e1d08dd8fe36c6c95c339a896cc33068148906784620540"
 dependencies = [
  "atoi",
+ "chrono",
  "flume",
  "futures-channel",
  "futures-core",
@@ -2430,6 +2437,7 @@ dependencies = [
  "sqlx-core",
  "tracing",
  "url",
+ "uuid",
 ]
 
 [[package]]
