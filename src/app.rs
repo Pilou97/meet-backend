@@ -1,5 +1,5 @@
 use crate::{
-    adapters::input::http::handlers::{hello::HelloRouter, meeting::MeetingRouter},
+    adapters::input::http::handlers::meeting::MeetingRouter,
     config::Config,
     ports::output::{meeting_repository::MeetingRepository, room_manager::RoomManager},
 };
@@ -16,13 +16,10 @@ where
     M: RoomManager + Send + Sync + 'static,
 {
     let api_service = poem_openapi::OpenApiService::new(
-        (
-            MeetingRouter {
-                repository,
-                room_manager,
-            },
-            HelloRouter {},
-        ),
+        MeetingRouter {
+            repository,
+            room_manager,
+        },
         "API",
         "1.0",
     )

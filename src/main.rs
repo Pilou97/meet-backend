@@ -2,7 +2,6 @@ use adapters::output::{livekit::Livekit, repository::db::Repository};
 use anyhow::Context;
 use app::app;
 use config::Config;
-use poem::handler;
 use shuttle_poem::ShuttlePoem;
 use sqlx::PgPool;
 
@@ -12,11 +11,6 @@ pub mod config;
 pub mod domain;
 pub mod ports;
 pub mod services;
-
-#[handler]
-fn hello_world() -> &'static str {
-    "Hello, world!"
-}
 
 #[shuttle_runtime::main]
 async fn main(
