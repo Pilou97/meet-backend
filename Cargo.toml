@@ -7,6 +7,8 @@ edition = "2021"
 anyhow = "1.0.95"
 chrono = "0.4.39"
 derive_more = { version = "2.0.1", features = ["as_ref"] }
+livekit = "0.7.5"
+livekit-api = "0.4.2"
 mockall = "0.13.1"
 poem = { version = "3.0.0", features = ["test"] }
 poem-openapi = { version = "5.1.5", features = [
