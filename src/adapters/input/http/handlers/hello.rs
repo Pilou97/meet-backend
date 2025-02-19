@@ -12,35 +12,17 @@ impl HelloRouter {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
-
     use crate::{
         app::app,
         config::Config,
         ports::output::{meeting_repository::MockMeetingRepository, room_manager::MockRoomManager},
     };
     use poem::test::TestClient;
-    use shuttle_common::secrets::Secret;
-    use shuttle_runtime::SecretStore;
-
-    fn config() -> Config {
-        let mut map = BTreeMap::new();
-        map.insert(
-            "SWAGGER_URI".to_string(),
-            Secret::from("http://localhost:8000".to_string()),
-        );
-        map.insert(
-            "DATABASE_URL".to_string(),
-            Secret::from("postgres://test@test.com".to_string()),
-        );
-        let secrets = SecretStore::new(map);
-        Config::new(secrets).unwrap()
-    }
 
     #[tokio::test]
     async fn test_hello() {
         let app = app(
-            config(),
+            Config::create_mock(),
             MockMeetingRepository::new(),
             MockRoomManager::new(),
         )

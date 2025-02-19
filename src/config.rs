@@ -30,4 +30,30 @@ impl Config {
             livekit_secret,
         })
     }
+
+    #[cfg(test)]
+    pub fn create_mock() -> Self {
+        use shuttle_common::secrets::Secret;
+        use std::collections::BTreeMap;
+
+        let mut map = BTreeMap::new();
+        map.insert(
+            "SWAGGER_URI".to_string(),
+            Secret::from("http://localhost:8000".to_string()),
+        );
+        map.insert(
+            "DATABASE_URL".to_string(),
+            Secret::from("postgres://test@test.com".to_string()),
+        );
+        map.insert(
+            "LIVEKIT_API_KEY".to_string(),
+            Secret::from("livekit_api_key".to_string()),
+        );
+        map.insert(
+            "LIVEKIT_SECRET".to_string(),
+            Secret::from("livekit_secret".to_string()),
+        );
+        let secrets = SecretStore::new(map);
+        Config::new(secrets).unwrap()
+    }
 }

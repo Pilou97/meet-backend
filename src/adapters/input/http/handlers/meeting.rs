@@ -61,8 +61,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeMap;
-
     use crate::{
         app,
         config::Config,
@@ -73,8 +71,6 @@ mod tests {
     use mockall::predicate::eq;
     use poem::{http::StatusCode, test::TestClient};
     use serde::Serialize;
-    use shuttle_common::secrets::Secret;
-    use shuttle_runtime::SecretStore;
 
     #[derive(Serialize)]
     struct Body<'a> {
@@ -84,20 +80,6 @@ mod tests {
 
     fn token(studio_id: StudioId) -> String {
         studio_id.as_ref().to_string()
-    }
-
-    fn config() -> Config {
-        let mut map = BTreeMap::new();
-        map.insert(
-            "SWAGGER_URI".to_string(),
-            Secret::from("http://localhost:8000".to_string()),
-        );
-        map.insert(
-            "DATABASE_URL".to_string(),
-            Secret::from("postgres://test@test.com".to_string()),
-        );
-        let secrets = SecretStore::new(map);
-        Config::new(secrets).unwrap()
     }
 
     #[tokio::test]
@@ -116,7 +98,7 @@ mod tests {
             .with(eq(studio_id.clone()))
             .return_once(|_| Box::pin(async { Ok(vec![]) }));
 
-        let app = app(config(), mock_repo, MockRoomManager::new())
+        let app = app(Config::create_mock(), mock_repo, MockRoomManager::new())
             .await
             .unwrap();
 
@@ -142,7 +124,7 @@ mod tests {
     #[tokio::test]
     pub async fn test_payload_parsing_fail_name_is_empty() {
         let app = app(
-            config(),
+            Config::create_mock(),
             MockMeetingRepository::new(),
             MockRoomManager::new(),
         )
@@ -165,7 +147,7 @@ mod tests {
     #[tokio::test]
     pub async fn test_authorization_is_needed() {
         let app = app(
-            config(),
+            Config::create_mock(),
             MockMeetingRepository::new(),
             MockRoomManager::new(),
         )
