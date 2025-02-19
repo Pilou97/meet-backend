@@ -62,10 +62,11 @@ where
 #[cfg(test)]
 mod tests {
     use crate::{
-        app,
-        config::Config,
         domain::studio::StudioId,
-        ports::output::{meeting_repository::MockMeetingRepository, room_manager::MockRoomManager},
+        ports::output::{
+            config::MockConfig, meeting_repository::MockMeetingRepository,
+            room_manager::MockRoomManager,
+        },
     };
     use chrono::{Days, Utc};
     use mockall::predicate::eq;
@@ -98,7 +99,7 @@ mod tests {
             .with(eq(studio_id.clone()))
             .return_once(|_| Box::pin(async { Ok(vec![]) }));
 
-        let app = app(Config::create_mock(), mock_repo, MockRoomManager::new())
+        let app = crate::app::app(MockConfig::new(), mock_repo, MockRoomManager::new())
             .await
             .unwrap();
 
@@ -123,8 +124,8 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_payload_parsing_fail_name_is_empty() {
-        let app = app(
-            Config::create_mock(),
+        let app = crate::app::app(
+            MockConfig::new(),
             MockMeetingRepository::new(),
             MockRoomManager::new(),
         )
@@ -146,8 +147,8 @@ mod tests {
 
     #[tokio::test]
     pub async fn test_authorization_is_needed() {
-        let app = app(
-            Config::create_mock(),
+        let app = crate::app::app(
+            MockConfig::new(),
             MockMeetingRepository::new(),
             MockRoomManager::new(),
         )

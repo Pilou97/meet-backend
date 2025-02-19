@@ -1,17 +1,15 @@
 use crate::{
     adapters::input::http::handlers::meeting::MeetingRouter,
-    config::Config,
-    ports::output::{meeting_repository::MeetingRepository, room_manager::RoomManager},
+    ports::output::{
+        config::Config, meeting_repository::MeetingRepository, room_manager::RoomManager,
+    },
 };
 use anyhow::Error;
 use poem::{middleware::Cors, Endpoint, EndpointExt, Route};
 
-pub async fn app<R, M>(
-    config: Config,
-    repository: R,
-    room_manager: M,
-) -> Result<impl Endpoint, Error>
+pub async fn app<C, R, M>(config: C, repository: R, room_manager: M) -> Result<impl Endpoint, Error>
 where
+    C: Config,
     R: MeetingRepository + Send + Sync + 'static,
     M: RoomManager + Send + Sync + 'static,
 {
@@ -23,7 +21,7 @@ where
         "API",
         "1.0",
     )
-    .server(config.swagger_uri);
+    .server(config.swagger_uri());
 
     let api_swagger = api_service.swagger_ui();
     let spec_json = api_service.spec_endpoint();
