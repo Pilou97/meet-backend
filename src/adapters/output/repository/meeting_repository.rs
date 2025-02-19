@@ -111,7 +111,7 @@ mod tests {
             name: MeetingName::try_from("Hello meeting".to_string()).unwrap(),
             date: Utc::now(),
         };
-        let _ = repository.create_meeting(&meeting).await.unwrap();
+        repository.create_meeting(&meeting).await.unwrap();
         let Some(retrieved) = repository.find_meeting(&meeting.id).await.unwrap() else {
             panic!("A meeting should have been created")
         };
@@ -136,8 +136,8 @@ mod tests {
             name: MeetingName::try_from("Hello meeting".to_string()).unwrap(),
             date: Utc::now(),
         };
-        let _ = repository.create_meeting(&meeting_one).await.unwrap();
-        let _ = repository.create_meeting(&meeting_two).await.unwrap();
+        repository.create_meeting(&meeting_one).await.unwrap();
+        repository.create_meeting(&meeting_two).await.unwrap();
 
         let list = repository.list_meetings(&studio_id).await.unwrap();
         let list_2 = repository.list_meetings(&other_studio).await.unwrap();

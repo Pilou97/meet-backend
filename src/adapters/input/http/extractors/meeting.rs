@@ -61,7 +61,7 @@ mod tests {
         let meeting_id = MeetingId::new();
 
         let res = cli
-            .get(format!("/test/{}", meeting_id.as_ref().to_string()))
+            .get(format!("/test/{}", meeting_id.as_ref()))
             .send()
             .await;
         res.assert_status_is_ok();
