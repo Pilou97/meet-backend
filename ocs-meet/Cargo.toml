@@ -1,0 +1,37 @@
+[package]
+name = "ocs-meet"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.95"
+chrono = "0.4.39"
+derive_more = { version = "2.0.1", features = ["as_ref"] }
+livekit = "0.7.5"
+livekit-api = "0.4.2"
+mockall = "0.13.1"
+poem = { version = "3.0.0", features = ["test"] }
+poem-openapi = { version = "5.1.5", features = [
+    "swagger-ui",
+    "uuid",
+    "chrono",
+] }
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.138"
+shuttle-common = "0.52.0"
+shuttle-poem = "0.52.0"
+shuttle-runtime = "0.52.0"
+shuttle-shared-db = { version = "0.52.0", features = ["sqlx", "postgres"] }
+sqlx = { version = "0.8.3", features = [
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "runtime-tokio",
+    "migrate",
+] }
+thiserror = "2.0.11"
+tokio = "1.26.0"
+url = "2.5.4"
+uuid = { version = "1.13.1", features = ["v4", "serde"] }
+validator = { version = "0.20.0", features = ["derive"] }
